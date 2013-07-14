@@ -1,2 +1,2 @@
-dddmelb-rx
+Reactive Extensions for Mere Mortals
 ==========
