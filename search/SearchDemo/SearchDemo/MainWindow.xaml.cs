@@ -87,7 +87,7 @@ namespace SearchDemo
                      .Where(a => a.Title.ToLowerInvariant().Contains(text.ToLowerInvariant()));
         }
 
-        public static string GetDatabasePath()
+        static string GetDatabasePath()
         {
             var path = (new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath;
             var directory = System.IO.Path.GetDirectoryName(path);
