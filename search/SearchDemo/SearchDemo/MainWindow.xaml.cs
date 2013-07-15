@@ -7,7 +7,6 @@ using System.Reactive.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
 using SQLite;
 using System.Threading;
 
@@ -26,6 +25,7 @@ namespace SearchDemo
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            // this is what we display to the user
             Items.ItemsSource = _collection;
 
             // old and busted way
@@ -33,10 +33,13 @@ namespace SearchDemo
             {
                 Debug.WriteLine("blocking started at {0}", Environment.TickCount);
 
+                // clean up the list
                 Dispatcher.Invoke(() => _collection.Clear());
 
+                // get the data
                 var items = SearchFor(SearchTextBlocking.Text).ToList();
 
+                // and display the results
                 Dispatcher.Invoke(() =>
                 {
                     foreach (var item in items)
@@ -61,6 +64,7 @@ namespace SearchDemo
                     Debug.WriteLine("Async started at {0}", Environment.TickCount);
                     _collection.Clear();
 
+                    // this could be better
                     var source = next.Sender as TextBox;
                     var text = source.Text;
 
@@ -87,8 +91,7 @@ namespace SearchDemo
         {
             var path = (new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath;
             var directory = System.IO.Path.GetDirectoryName(path);
-            var dbPath = System.IO.Path.Combine(directory, "Chinook_Sqlite.sqlite");
-            return dbPath;
+            return System.IO.Path.Combine(directory, "Chinook_Sqlite.sqlite");
         }
     }
 
