@@ -58,17 +58,20 @@ namespace SearchDemo
             // TODO: this maniac types too fast! halp!            
             textChangedObservable
                 .ObserveOn(SynchronizationContext.Current)
+                .Select(next =>
+                {
+                    // what is the text at this point in time?
+                    var source = next.Sender as TextBox;
+                    var text = source.Text;
+                    return text;
+                })
                 .Subscribe(next =>
                 {
                     // let me know when it starts
                     Debug.WriteLine("Async started at {0}", Environment.TickCount);
                     _collection.Clear();
 
-                    // this could be better
-                    var source = next.Sender as TextBox;
-                    var text = source.Text;
-
-                    SearchFor(text).ToObservable() 
+                    SearchFor(next).ToObservable() 
                         // ensure this runs on the main thread
                         .ObserveOn(SynchronizationContext.Current)
                         // Finally will run whether the observable collection completes or errors
