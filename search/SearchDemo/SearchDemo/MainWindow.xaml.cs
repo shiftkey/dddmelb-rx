@@ -16,6 +16,8 @@ namespace SearchDemo
     {
         // this is not MVVM, feel free to mail me the hatorade
         readonly ObservableCollection<Album> _collection = new ObservableCollection<Album>();
+        // this is slightly better MVVM because i called it a viewmodel
+        MainViewModel viewModel = new MainViewModel();
 
         public MainWindow()
         {
@@ -55,30 +57,18 @@ namespace SearchDemo
                 handler => SearchTextReactive.TextChanged += handler,
                 handler => SearchTextReactive.TextChanged -= handler);
 
-            // TODO: this maniac types too fast! halp!            
-            textChangedObservable
+            var textObservable = textChangedObservable
                 .ObserveOn(SynchronizationContext.Current)
+                .Throttle(TimeSpan.FromMilliseconds(500))
                 .Select(next =>
                 {
                     // what is the text at this point in time?
                     var source = next.Sender as TextBox;
                     var text = source.Text;
                     return text;
-                })
-                .Subscribe(next =>
-                {
-                    // let me know when it starts
-                    Debug.WriteLine("Async started at {0}", Environment.TickCount);
-                    _collection.Clear();
-
-                    SearchFor(next).ToObservable() 
-                        // ensure this runs on the main thread
-                        .ObserveOn(SynchronizationContext.Current)
-                        // Finally will run whether the observable collection completes or errors
-                        .Finally(() => { Count.Text = string.Format("Found {0} results", _collection.Count); })
-                        // with each item, add it to the collection
-                        .Subscribe(_collection.Add);
                 });
+
+            viewModel.WhenTextChanged(textObservable);
         }
 
         static IEnumerable<Album> SearchFor(string text)
