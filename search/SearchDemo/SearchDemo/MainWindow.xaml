@@ -19,7 +19,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Search (blocking):"  FontWeight="Bold" Grid.Row="0" />
+            <TextBlock Text="Search (immediate):"  FontWeight="Bold" Grid.Row="0" />
             <TextBox x:Name="SearchTextBlocking" Width="100" Grid.Column="1" Grid.Row="0" />
             <TextBlock Text="Search (reactive):" FontWeight="Bold" Grid.Row="1" Grid.Column="0" />
             <TextBox x:Name="SearchTextReactive" Width="100" Grid.Column="1" Grid.Row="1" />

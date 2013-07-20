@@ -8,7 +8,6 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using SQLite;
-using System.Threading;
 
 namespace SearchDemo
 {
@@ -17,7 +16,7 @@ namespace SearchDemo
         // this is not MVVM, feel free to mail me the hatorade
         readonly ObservableCollection<Album> _collection = new ObservableCollection<Album>();
         // this is slightly better MVVM because i called it a viewmodel
-        MainViewModel viewModel = new MainViewModel();
+        //MainViewModel viewModel = new MainViewModel();
 
         public MainWindow()
         {
@@ -31,44 +30,68 @@ namespace SearchDemo
             Items.ItemsSource = _collection;
 
             // old and busted way
-            SearchTextBlocking.TextChanged += (sender1, textChangedEventArgs) =>
-            {
-                Debug.WriteLine("blocking started at {0}", Environment.TickCount);
-
-                // clean up the list
-                Dispatcher.Invoke(() => _collection.Clear());
-
-                // get the data
-                var items = SearchFor(SearchTextBlocking.Text).ToList();
-
-                // and display the results
-                Dispatcher.Invoke(() =>
-                {
-                    foreach (var item in items)
-                        _collection.Add(item);
-
-                    Count.Text = string.Format("Found {0} results", items.Count);
-                });
-            };
+            SearchTextBlocking.TextChanged += UpdateSearchResults;
 
             // new way
+            SetupObservable();
+
+            // populate all the items initially
+            UpdateSearchResults(SearchTextBlocking, null);
+        }
+
+        void UpdateSearchResults(object sender, TextChangedEventArgs args)
+        {
+            WhatTimeIsIt("immediate");
+
+            // clean up the list
+            Dispatcher.Invoke(() => _collection.Clear());
+
+            // get the data
+            var items = SearchFor(SearchTextBlocking.Text).ToList();
+
+            // and display the results
+            Dispatcher.Invoke(() =>
+            {
+                foreach (var item in items)
+                    _collection.Add(item);
+
+                Count.Text = string.Format("Found {0} results", items.Count);
+            });
+        }
+
+        void SetupObservable()
+        {
             // turn the TextChanged events into a collection
             var textChangedObservable = Observable.FromEventPattern<TextChangedEventHandler, TextChangedEventArgs>(
                 handler => SearchTextReactive.TextChanged += handler,
                 handler => SearchTextReactive.TextChanged -= handler);
 
             var textObservable = textChangedObservable
-                .ObserveOn(SynchronizationContext.Current)
                 .Throttle(TimeSpan.FromMilliseconds(500))
+                .ObserveOn(Dispatcher) // UI thread feels
                 .Select(next =>
                 {
-                    // what is the text at this point in time?
+                    // so what is the text at this point in time?
                     var source = next.Sender as TextBox;
                     var text = source.Text;
                     return text;
                 });
 
-            viewModel.WhenTextChanged(textObservable);
+            textObservable.Subscribe(text =>
+            {
+                WhatTimeIsIt("reactive");
+
+                _collection.Clear();
+
+                SearchFor(text).ToObservable()
+                    .Finally(() => { Count.Text = string.Format("Found {0} results", _collection.Count); })
+                    .Subscribe(_collection.Add);
+            });
+        }
+
+        static void WhatTimeIsIt(string category)
+        {
+            Debug.WriteLine("{0} started at {1}", category, DateTime.Now.ToLongTimeString());
         }
 
         static IEnumerable<Album> SearchFor(string text)
