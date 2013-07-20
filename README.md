@@ -6,6 +6,7 @@ This is the code and slides from a talk I gave at [DDD Melbourne](http://dddmelb
 - [Slides (PPTX)](https://dl.dropboxusercontent.com/u/5803705/talks/ReactiveExtensions.pptx)
 - [Slides (PDF)](https://dl.dropboxusercontent.com/u/5803705/talks/ReactiveExtensions.pdf)
 - [Reactive Extensions](http://rx.codeplex.com/)
+- [101 Rx Samples](http://rxwiki.wikidot.com/101samples)
 
 Reactive Extensions in the wild:
 
