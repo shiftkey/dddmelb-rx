@@ -12,8 +12,8 @@ namespace MakingWebRequests
         static void Main(string[] args)
         {
             var url = "http://httpstat.us/404";
-            MakeAnAsyncRequest(url).Wait();
-            //MakeAnObservableRequest(url).Wait();
+            //await MakeAnAsyncRequest(url);
+            MakeAnObservableRequest(url).Wait();
         }
 
         static async Task MakeAnAsyncRequest(string url)
@@ -21,7 +21,8 @@ namespace MakingWebRequests
             var client = new HttpClient();
             var response = await client.GetAsync(url);
             var text = await response.Content.ReadAsStringAsync();
-            var json = await JsonConvert.DeserializeObjectAsync(text); // this should explode
+            // this should explode
+            var json = await JsonConvert.DeserializeObjectAsync(text);
         }
 
         static IObservable<object> MakeAnObservableRequest(string url)
