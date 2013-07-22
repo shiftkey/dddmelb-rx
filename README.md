@@ -17,7 +17,7 @@ Reactive Extensions in the wild:
 Interesting Rx Projects:
 
 - [Reactive.EventAggregator](https://github.com/shiftkey/Reactive.EventAggregator)
-- [BoxKite.Twitter](https://github.com/shiftkey/Reactive.EventAggregator)
+- [BoxKite.Twitter](https://github.com/NickHodge/BoxKite.Twitter/)
 - [ReactiveUI](https://github.com/reactiveui/reactiveui)
 - [Akavache](https://github.com/github/akavache)
 
